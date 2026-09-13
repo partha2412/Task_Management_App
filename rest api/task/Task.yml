@@ -1,0 +1,31 @@
+info:
+  name: Task
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3000/api/tasks
+  headers:
+    - name: Authorization
+      value: Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTlkMTIzZDYxMTVkNDY5ZWFmMDUxYjgiLCJpYXQiOjE3ODkzMTg2ODEsImV4cCI6MTc4OTkyMzQ4MX0.jPMga5vDGvJSISUXwsQp5FbMkPZKhESjumeTD8rAkl4
+  body:
+    type: json
+    data: |-
+      {
+        "title": "making a expo app",
+        "description": "understand the concept of react native expo",
+        "status": "pending",
+        "priority": "medium",
+
+        "email": "partha@gmail.com",
+        "password": "123456"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+​
