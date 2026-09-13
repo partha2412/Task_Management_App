@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   ScrollView,
   RefreshControl,
 } from "react-native";
@@ -34,6 +33,7 @@ const Tasks = () => {
   } as const;
 
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const API_URL = "https://task-management-s7bu.onrender.com/api";
@@ -44,6 +44,7 @@ const Tasks = () => {
 
       if (!token) {
         console.log("No token found");
+        navigation.replace("Auth");
         return;
       }
 
@@ -63,6 +64,8 @@ const Tasks = () => {
       }
     } catch (error) {
       console.error("Fetch tasks error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,6 +87,7 @@ const Tasks = () => {
 
       if (!token) {
         console.log("No token found");
+        navigation.replace("Auth");
         return;
       }
 
@@ -100,6 +104,20 @@ const Tasks = () => {
     } catch (error) {
       console.error("Delete task error:", error);
     }
+  }
+
+  /*
+   * REAL BACKEND LOADING
+   */
+  if (loading) {
+    return (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <SkeletonLoader />
+      </ScrollView>
+    );
   }
 
   return (
@@ -140,8 +158,7 @@ const Tasks = () => {
           <View style={styles.taskList}>
             {tasks.map((task, index) => (
               <View key={task._id} style={styles.task}>
-                
-                {/* Left Section */}
+                {/* Left */}
                 <View style={styles.left}>
                   <Text style={styles.taskLabel}>TASK</Text>
 
@@ -161,7 +178,7 @@ const Tasks = () => {
                   </View>
                 </View>
 
-                {/* Main Section */}
+                {/* Content */}
                 <View style={styles.right}>
                   <View style={styles.topRow}>
                     <View style={styles.titleContainer}>
@@ -229,7 +246,11 @@ const Tasks = () => {
 
                   <Pressable
                     style={[styles.optionButton, styles.deleteButton]}
-                    onPress={() => deleteTask({ task_id: task._id })}
+                    onPress={() =>
+                      deleteTask({
+                        task_id: task._id,
+                      })
+                    }
                   >
                     <MaterialIcons
                       name="delete-outline"
@@ -247,12 +268,55 @@ const Tasks = () => {
   );
 };
 
+function SkeletonLoader() {
+  return (
+    <View style={styles.skeletonContainer}>
+      {Array.from({ length: 6 }).map((_, index) => (
+        <View key={index} style={styles.skeletonTask}>
+          <View style={styles.skeletonLeft}>
+            <View style={styles.skeletonLabel} />
+
+            <View style={styles.skeletonNumber} />
+
+            <View style={styles.skeletonPriority} />
+          </View>
+
+          <View style={styles.skeletonRight}>
+            <View style={styles.skeletonTopRow}>
+              <View style={styles.skeletonTitleContainer}>
+                <View style={styles.skeletonTitle} />
+
+                <View style={styles.skeletonTaskId} />
+              </View>
+
+              <View style={styles.skeletonStatusIcon} />
+            </View>
+
+            <View style={styles.skeletonDescription} />
+
+            <View style={styles.skeletonBottomRow}>
+              <View style={styles.skeletonStatus} />
+
+              <View style={styles.skeletonDate} />
+            </View>
+          </View>
+
+          <View style={styles.skeletonOptions}>
+            <View style={styles.skeletonIcon} />
+            <View style={styles.skeletonIcon} />
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export default Tasks;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F6F6F4",
   },
 
   scrollContent: {
@@ -282,8 +346,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
 
-  /* LEFT */
-
   left: {
     width: 82,
     paddingVertical: 16,
@@ -291,7 +353,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
 
-    backgroundColor: "#c5c5c3e3",
+    backgroundColor: "#F0F0ED",
 
     borderRightWidth: 1,
     borderRightColor: "#E8E8E5",
@@ -302,6 +364,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 1.4,
     color: "#A1A1AA",
+
     marginBottom: 2,
   },
 
@@ -340,17 +403,16 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 
-  /* RIGHT */
-
   right: {
     flex: 1,
+
     paddingLeft: 15,
     paddingRight: 55,
     paddingVertical: 15,
 
     justifyContent: "space-between",
 
-    backgroundColor: "#e1e1e1ba",
+    backgroundColor: "#FFFFFF",
   },
 
   topRow: {
@@ -365,7 +427,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "750",
     color: "#18181B",
     letterSpacing: -0.3,
   },
@@ -409,8 +471,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
 
     color: "#71717A",
-
-    letterSpacing: -0.05,
   },
 
   bottomRow: {
@@ -459,10 +519,9 @@ const styles = StyleSheet.create({
     color: "#A1A1AA",
   },
 
-  /* OPTIONS */
-
   options: {
     position: "absolute",
+
     right: 10,
     top: 15,
 
@@ -488,7 +547,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEF2F2",
   },
 
-  /* EMPTY STATE */
+  /* EMPTY */
 
   emptyState: {
     minHeight: 300,
@@ -531,8 +590,7 @@ const styles = StyleSheet.create({
 
   emptyTitle: {
     fontSize: 19,
-    fontWeight: "800",
-    // fontWeight: "750",
+    fontWeight: "750",
     color: "#18181B",
     letterSpacing: -0.4,
   },
@@ -571,5 +629,185 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
     color: "#FFFFFF",
+  },
+
+  /* SKELETON */
+
+  skeletonContainer: {
+    gap: 12,
+  },
+
+  skeletonTask: {
+    minHeight: 132,
+
+    borderRadius: 18,
+
+    flexDirection: "row",
+
+    overflow: "hidden",
+
+    backgroundColor: "#FFFFFF",
+
+    elevation: 1,
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 7,
+  },
+
+  skeletonLeft: {
+    width: 82,
+
+    paddingVertical: 16,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    backgroundColor: "#F0F0ED",
+
+    gap: 6,
+  },
+
+  skeletonLabel: {
+    width: 25,
+    height: 7,
+
+    borderRadius: 3,
+
+    backgroundColor: "#DCDCD8",
+  },
+
+  skeletonNumber: {
+    width: 35,
+    height: 28,
+
+    borderRadius: 6,
+
+    backgroundColor: "#DCDCD8",
+  },
+
+  skeletonPriority: {
+    width: 42,
+    height: 13,
+
+    borderRadius: 8,
+
+    backgroundColor: "#DCDCD8",
+  },
+
+  skeletonRight: {
+    flex: 1,
+
+    paddingLeft: 15,
+    paddingRight: 55,
+    paddingVertical: 15,
+
+    justifyContent: "space-between",
+  },
+
+  skeletonTopRow: {
+    flexDirection: "row",
+
+    alignItems: "flex-start",
+  },
+
+  skeletonTitleContainer: {
+    flex: 1,
+
+    marginRight: 8,
+  },
+
+  skeletonTitle: {
+    width: "72%",
+    height: 16,
+
+    borderRadius: 5,
+
+    backgroundColor: "#E2E2DF",
+  },
+
+  skeletonTaskId: {
+    width: 38,
+    height: 7,
+
+    borderRadius: 3,
+
+    backgroundColor: "#E8E8E5",
+
+    marginTop: 5,
+  },
+
+  skeletonStatusIcon: {
+    width: 31,
+    height: 31,
+
+    borderRadius: 10,
+
+    backgroundColor: "#E8E8E5",
+  },
+
+  skeletonDescription: {
+    width: "88%",
+    height: 12,
+
+    borderRadius: 5,
+
+    backgroundColor: "#E8E8E5",
+
+    marginTop: 8,
+  },
+
+  skeletonBottomRow: {
+    flexDirection: "row",
+
+    justifyContent: "space-between",
+
+    alignItems: "center",
+
+    marginTop: 8,
+  },
+
+  skeletonStatus: {
+    width: 50,
+    height: 8,
+
+    borderRadius: 4,
+
+    backgroundColor: "#E8E8E5",
+  },
+
+  skeletonDate: {
+    width: 42,
+    height: 8,
+
+    borderRadius: 4,
+
+    backgroundColor: "#E8E8E5",
+  },
+
+  skeletonOptions: {
+    position: "absolute",
+
+    right: 10,
+    top: 15,
+
+    width: 31,
+
+    alignItems: "center",
+
+    gap: 7,
+  },
+
+  skeletonIcon: {
+    width: 31,
+    height: 31,
+
+    borderRadius: 9,
+
+    backgroundColor: "#E8E8E5",
   },
 });

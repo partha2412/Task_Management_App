@@ -1,22 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Tasks from "./components/Tasks";
 import { useNavigation } from "@react-navigation/native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function Home() {
   const navigate = useNavigation();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,7 +32,12 @@ export default function Home() {
             style={styles.profileButton}
             onPress={() => navigate.navigate("Auth")}
           >
-            <Text style={styles.profileText}>M</Text>
+            <MaterialCommunityIcons
+              name="login-variant"
+              size={24}
+              color="black"
+            />
+            {/* <Text style={styles.profileText}>M</Text> */}
           </Pressable>
         </View>
 
@@ -80,69 +77,18 @@ export default function Home() {
         </View>
 
         {/* Tasks */}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <View style={styles.taskWrapper}>
-            {loading ? <SkeletonLoader /> : <Tasks />}
-          </View>
-        </ScrollView>
+        <View style={styles.taskWrapper}>
+          <Tasks />
+        </View>
       </View>
     </SafeAreaView>
-  );
-}
-
-function SkeletonLoader() {
-  return (
-    <View style={styles.skeletonContainer}>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <View key={index} style={styles.skeletonTask}>
-          {/* Left */}
-          <View style={styles.skeletonLeft}>
-            <View style={styles.skeletonLabel} />
-
-            <View style={styles.skeletonNumber} />
-
-            <View style={styles.skeletonPriority} />
-          </View>
-
-          {/* Content */}
-          <View style={styles.skeletonRight}>
-            <View style={styles.skeletonTopRow}>
-              <View style={styles.skeletonTitleContainer}>
-                <View style={styles.skeletonTitle} />
-
-                <View style={styles.skeletonTaskId} />
-              </View>
-
-              <View style={styles.skeletonStatusIcon} />
-            </View>
-
-            <View style={styles.skeletonDescription} />
-
-            <View style={styles.skeletonBottomRow}>
-              <View style={styles.skeletonStatus} />
-
-              <View style={styles.skeletonDate} />
-            </View>
-          </View>
-
-          {/* Options */}
-          <View style={styles.skeletonOptions}>
-            <View style={styles.skeletonIcon} />
-            <View style={styles.skeletonIcon} />
-          </View>
-        </View>
-      ))}
-    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F6F6F4",
     paddingHorizontal: 20,
   },
 
@@ -188,7 +134,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: "#18181B",
+    backgroundColor: "#18181b43",
+    opacity: 0.4,
   },
 
   profileText: {
@@ -318,193 +265,9 @@ const styles = StyleSheet.create({
     color: "#71717A",
   },
 
-  /* SCROLL */
-
-  scrollContent: {
-    paddingBottom: 30,
-  },
+  /* TASK */
 
   taskWrapper: {
-    gap: 10,
-  },
-
-  /* SKELETON */
-
-  skeletonContainer: {
-    gap: 12,
-  },
-
-  skeletonTask: {
-    minHeight: 132,
-
-    borderRadius: 18,
-
-    flexDirection: "row",
-
-    overflow: "hidden",
-
-    backgroundColor: "#FFFFFF",
-
-    elevation: 1,
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.04,
-    shadowRadius: 7,
-  },
-
-  skeletonLeft: {
-    width: 82,
-
-    paddingVertical: 16,
-
-    justifyContent: "center",
-    alignItems: "center",
-
-    backgroundColor: "#F0F0ED",
-
-    gap: 6,
-  },
-
-  skeletonLabel: {
-    width: 25,
-    height: 7,
-
-    borderRadius: 3,
-
-    backgroundColor: "#DCDCD8",
-  },
-
-  skeletonNumber: {
-    width: 35,
-    height: 28,
-
-    borderRadius: 6,
-
-    backgroundColor: "#DCDCD8",
-  },
-
-  skeletonPriority: {
-    width: 42,
-    height: 13,
-
-    borderRadius: 8,
-
-    backgroundColor: "#DCDCD8",
-  },
-
-  skeletonRight: {
     flex: 1,
-
-    paddingLeft: 15,
-    paddingRight: 55,
-    paddingVertical: 15,
-
-    justifyContent: "space-between",
-  },
-
-  skeletonTopRow: {
-    flexDirection: "row",
-
-    alignItems: "flex-start",
-  },
-
-  skeletonTitleContainer: {
-    flex: 1,
-
-    marginRight: 8,
-  },
-
-  skeletonTitle: {
-    width: "72%",
-    height: 16,
-
-    borderRadius: 5,
-
-    backgroundColor: "#E2E2DF",
-  },
-
-  skeletonTaskId: {
-    width: 38,
-    height: 7,
-
-    borderRadius: 3,
-
-    backgroundColor: "#E8E8E5",
-
-    marginTop: 5,
-  },
-
-  skeletonStatusIcon: {
-    width: 31,
-    height: 31,
-
-    borderRadius: 10,
-
-    backgroundColor: "#E8E8E5",
-  },
-
-  skeletonDescription: {
-    width: "88%",
-    height: 12,
-
-    borderRadius: 5,
-
-    backgroundColor: "#E8E8E5",
-
-    marginTop: 8,
-  },
-
-  skeletonBottomRow: {
-    flexDirection: "row",
-
-    justifyContent: "space-between",
-
-    alignItems: "center",
-
-    marginTop: 8,
-  },
-
-  skeletonStatus: {
-    width: 50,
-    height: 8,
-
-    borderRadius: 4,
-
-    backgroundColor: "#E8E8E5",
-  },
-
-  skeletonDate: {
-    width: 42,
-    height: 8,
-
-    borderRadius: 4,
-
-    backgroundColor: "#E8E8E5",
-  },
-
-  skeletonOptions: {
-    position: "absolute",
-
-    right: 10,
-    top: 15,
-
-    width: 31,
-
-    alignItems: "center",
-
-    gap: 7,
-  },
-
-  skeletonIcon: {
-    width: 31,
-    height: 31,
-
-    borderRadius: 9,
-
-    backgroundColor: "#E8E8E5",
   },
 });
