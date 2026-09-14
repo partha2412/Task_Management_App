@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   RefreshControl,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -81,6 +82,23 @@ const Tasks = () => {
     setRefreshing(false);
   };
 
+  const showAlert = ({ task_id }: { task_id: string }) =>
+    Alert.alert(
+      "Delete the Task ?",
+      "delete the task from your database",
+      [
+        {
+          text: "Cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            deleteTask({task_id: task_id});
+          },
+        },
+      ],
+    );
+  
   async function deleteTask({ task_id }: { task_id: string }) {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -246,10 +264,8 @@ const Tasks = () => {
 
                   <Pressable
                     style={[styles.optionButton, styles.deleteButton]}
-                    onPress={() =>
-                      deleteTask({
-                        task_id: task._id,
-                      })
+                    onPress={
+                      () => showAlert({task_id:task._id})
                     }
                   >
                     <MaterialIcons
